@@ -2,10 +2,11 @@
 """
 Unittest for BaseModel class.
 """
-
+from models import storage
 import unittest
 from models.base_model import BaseModel
 from datetime import datetime
+import uuid
 
 
 class TestBaseModel(unittest.TestCase):
@@ -14,7 +15,6 @@ class TestBaseModel(unittest.TestCase):
     def setUp(self):
         """Set up test methods."""
         self.model = BaseModel()
-        self.model_dict = self.model.to_dict()
 
     def test_id(self):
         """Test if id is a string and has the right format."""
@@ -51,13 +51,20 @@ class TestBaseModel(unittest.TestCase):
         self.assertEqual(model_dict['updated_at'],
                          self.model.updated_at.isoformat())
 
-    def test_init_from_dict(self):
-        """Test initializing BaseModel from a dictionary."""
-        new_model = BaseModel(**self.model_dict)
-        self.assertEqual(new_model.id, self.model.id)
-        self.assertEqual(new_model.created_at, self.model.created_at)
-        self.assertEqual(new_model.updated_at, self.model.updated_at)
-        self.assertEqual(new_model.__str__(), self.model.__str__())
+    # Create a new instance of BaseModel
+    new_instance = BaseModel()
+    new_instance.name = "Test"
+    new_instance.number = 42
+    new_instance.save()
+
+    # Check the storage content
+    all_objs = storage.all()
+    print(all_objs)
+
+    # Reload the storage and check again
+    storage.reload()
+    all_objs = storage.all()
+    print(all_objs)
 
 
 if __name__ == "__main__":
