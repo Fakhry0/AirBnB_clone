@@ -6,7 +6,6 @@ Unittest for BaseModel class.
 import unittest
 from models.base_model import BaseModel
 from datetime import datetime
-import uuid
 
 
 class TestBaseModel(unittest.TestCase):
@@ -15,6 +14,7 @@ class TestBaseModel(unittest.TestCase):
     def setUp(self):
         """Set up test methods."""
         self.model = BaseModel()
+        self.model_dict = self.model.to_dict()
 
     def test_id(self):
         """Test if id is a string and has the right format."""
@@ -50,6 +50,14 @@ class TestBaseModel(unittest.TestCase):
                          self.model.created_at.isoformat())
         self.assertEqual(model_dict['updated_at'],
                          self.model.updated_at.isoformat())
+
+    def test_init_from_dict(self):
+        """Test initializing BaseModel from a dictionary."""
+        new_model = BaseModel(**self.model_dict)
+        self.assertEqual(new_model.id, self.model.id)
+        self.assertEqual(new_model.created_at, self.model.created_at)
+        self.assertEqual(new_model.updated_at, self.model.updated_at)
+        self.assertEqual(new_model.__str__(), self.model.__str__())
 
 
 if __name__ == "__main__":
