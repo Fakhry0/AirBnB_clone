@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+"""Module for the entry point of the command interpreter."""
+
 import cmd
 
 
@@ -18,17 +20,10 @@ class HBNBCommand(cmd.Cmd):
         """Do nothing on empty input line."""
         pass
 
-    def do_help(self, arg):
-        """List available commands with "help" or detailed help with "help cmd"."""
-        if arg:
-            # Get the method for the command if it exists
-            cmd_method = getattr(self, 'do_' + arg, None)
-            if cmd_method:
-                print(cmd_method.__doc__)
-            else:
-                print(f"No help for '{arg}'")
-        else:
-            super().do_help(arg)
+    def postcmd(self, stop, line):
+        """Add an extra newline after each command execution."""
+        print()
+        return stop
 
 
 if __name__ == '__main__':
