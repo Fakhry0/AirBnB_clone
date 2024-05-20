@@ -58,7 +58,8 @@ class HBNBCommand(cmd.Cmd):
         if len(args) < 2:
             print("** instance id missing **")
             return
-        key = class_name + '.' + args[1]
+        instance_id = args[1]
+        key = class_name + '.' + instance_id
         if key in storage.all():
             print(storage.all()[key])
         else:
@@ -77,7 +78,8 @@ class HBNBCommand(cmd.Cmd):
         if len(args) < 2:
             print("** instance id missing **")
             return
-        key = class_name + '.' + args[1]
+        instance_id = args[1]
+        key = class_name + '.' + instance_id
         if key in storage.all():
             del storage.all()[key]
             storage.save()
@@ -109,7 +111,8 @@ class HBNBCommand(cmd.Cmd):
         if len(args) < 2:
             print("** instance id missing **")
             return
-        key = class_name + '.' + args[1]
+        instance_id = args[1]
+        key = class_name + '.' + instance_id
         if key not in storage.all():
             print("** no instance found **")
             return
@@ -126,7 +129,7 @@ class HBNBCommand(cmd.Cmd):
         instance.save()
 
     def default(self, arg):
-        """Handle method calls with format <class name>.all() or <class name>.count()"""
+        """Handle method calls with format <class name>.all(), <class name>.count(), or <class name>.show(<id>)"""
         tokens = arg.split('.')
         if len(tokens) == 2:
             class_name, method = tokens
@@ -142,6 +145,9 @@ class HBNBCommand(cmd.Cmd):
                     return
                 print(len([value for value in storage.all().values()
                       if isinstance(value, globals()[class_name])]))
+            elif method.startswith('show(') and method.endswith(')'):
+                instance_id = method.strip('show(').strip(')')
+                self.do_show(f"{class_name} {instance_id}")
             else:
                 print("** invalid syntax **")
         else:
