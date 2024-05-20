@@ -125,6 +125,19 @@ class HBNBCommand(cmd.Cmd):
         setattr(instance, attr_name, attr_value)
         instance.save()
 
+    def default(self, arg):
+        """Handle method calls with format <class name>.all()"""
+        tokens = arg.split('.')
+        if len(tokens) == 2 and tokens[1] == 'all()':
+            class_name = tokens[0]
+            if class_name not in globals():
+                print("** class doesn't exist **")
+                return
+            print([str(value) for value in storage.all().values()
+                  if isinstance(value, globals()[class_name])])
+            return
+        super().default(arg)
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
