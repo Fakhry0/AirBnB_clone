@@ -100,36 +100,28 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, arg):
         """Updates an instance based on the class name and id."""
-        args = arg.split()
-        if len(args) == 0:
-            print("** class name missing **")
+        args = arg.split(',')
+        if len(args) < 3:
+            print("** invalid number of arguments **")
             return
-        class_name = args[0]
-        if class_name not in globals():
-            print("** class doesn't exist **")
+        class_name_id = args[0].split()
+        if len(class_name_id) != 2:
+            print("** invalid syntax **")
             return
-        if len(args) < 2:
-            print("** instance id missing **")
-            return
-        instance_id = args[1]
+        class_name = class_name_id[0]
+        instance_id = class_name_id[1]
         key = class_name + '.' + instance_id
         if key not in storage.all():
             print("** no instance found **")
             return
-        if len(args) < 3:
-            print("** attribute name missing **")
-            return
-        if len(args) < 4:
-            print("** value missing **")
-            return
-        attr_name = args[2]
-        attr_value = args[3]
+        attribute_name = args[1].strip()
+        attribute_value = args[2].strip()
         instance = storage.all()[key]
-        setattr(instance, attr_name, attr_value)
+        setattr(instance, attribute_name, attribute_value)
         instance.save()
 
     def default(self, arg):
-        """Handle method calls with format <class name>.all(), <class name>.count(), <class name>.show(<id>), or <class name>.destroy(<id>)"""
+        """Handle method calls with format <class name>.all(), <class name>.count(), <class name>.show(<id>), <class name>.destroy(<id>), or <class name>.update(<id>, <attribute name>, <attribute value>)"""
         tokens = arg.split('.')
         if len(tokens) == 2:
             class_name, method = tokens
@@ -151,6 +143,12 @@ class HBNBCommand(cmd.Cmd):
             elif method.startswith('destroy(') and method.endswith(')'):
                 instance_id = method.strip('destroy(').strip(')')
                 self.do_destroy(f"{class_name} {instance_id}")
+            elif method.startswith('update(') and method.endswith(')'):
+                args = method.strip('update(').strip(')').split(',')
+                if len(args) != 3:
+                    print("** invalid syntax **")
+                    return
+                self.do_update(f"{class_name} {args[0]}, {args[1]}, {args[2]}")
             else:
                 print("** invalid syntax **")
         else:
