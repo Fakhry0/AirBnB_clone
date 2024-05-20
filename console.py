@@ -140,7 +140,10 @@ class HBNBCommand(cmd.Cmd):
             instance.save()
 
     def default(self, arg):
-        """Handle method calls with format <class name>.all(), <class name>.count(), <class name>.show(<id>), <class name>.destroy(<id>), or <class name>.update(<id>, <attribute name>, <attribute value>)"""
+        """Handle method calls with format<class name>.all(),
+        <class name>.count(), <class name>.show(<id>),
+        <class name>.destroy(<id>), or <class name>.update(<id>,
+        <attribute name>, <attribute value>)"""
         tokens = arg.split('.')
         if len(tokens) == 2:
             class_name, method = tokens
