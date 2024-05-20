@@ -67,6 +67,49 @@ class TestBaseModel(unittest.TestCase):
         self.assertEqual(obj.updated_at, new_obj.updated_at)
         self.assertNotIn("__class__", new_obj.__dict__)
 
+    def test_state(self):
+        state = State()
+        self.assertEqual(state.name, "")
+        self.assertTrue(hasattr(state, "id"))
+        self.assertTrue(hasattr(state, "created_at"))
+        self.assertTrue(hasattr(state, "updated_at"))
+
+    def test_city(self):
+        city = City()
+        self.assertEqual(city.state_id, "")
+        self.assertEqual(city.name, "")
+        self.assertTrue(hasattr(city, "id"))
+        self.assertTrue(hasattr(city, "created_at"))
+        self.assertTrue(hasattr(city, "updated_at"))
+
+    def test_amenity(self):
+        amenity = Amenity()
+        self.assertEqual(amenity.name, "")
+        self.assertTrue(hasattr(amenity, "id"))
+        self.assertTrue(hasattr(amenity, "created_at"))
+        self.assertTrue(hasattr(amenity, "updated_at"))
+
+    def test_place(self):
+        place = Place()
+        self.assertEqual(place.city_id, "")
+        self.assertEqual(place.user_id, "")
+        self.assertEqual(place.name, "")
+        self.assertEqual(place.description, "")
+        self.assertEqual(place.number_rooms, 0)
+        # Add more assertions for other attributes
+        self.assertTrue(hasattr(place, "id"))
+        self.assertTrue(hasattr(place, "created_at"))
+        self.assertTrue(hasattr(place, "updated_at"))
+
+    def test_review(self):
+        review = Review()
+        self.assertEqual(review.place_id, "")
+        self.assertEqual(review.user_id, "")
+        self.assertEqual(review.text, "")
+        self.assertTrue(hasattr(review, "id"))
+        self.assertTrue(hasattr(review, "created_at"))
+        self.assertTrue(hasattr(review, "updated_at"))
+
 
 if __name__ == '__main__':
     unittest.main()
