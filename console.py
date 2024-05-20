@@ -3,6 +3,7 @@
 Command interpreter for AirBnB clone project.
 """
 import cmd
+import json
 from models import storage
 from models.base_model import BaseModel
 from models.user import User
@@ -116,6 +117,20 @@ class HBNBCommand(cmd.Cmd):
         if key not in storage.all():
             print("** no instance found **")
             return
+
+        if len(args) == 3 and args[2].startswith('{') and args[2].endswith('}'):
+            # Update with dictionary representation
+            try:
+                update_dict = json.loads(args[2])
+                instance = storage.all()[key]
+                for attr, val in update_dict.items():
+                    if attr not in ["id", "created_at", "updated_at"]:
+                        setattr(instance, attr, val)
+                instance.save()
+            except json.JSONDecodeError:
+                print("** invalid dictionary syntax **")
+            return
+
         if len(args) < 3:
             print("** attribute name missing **")
             return
@@ -170,18 +185,16 @@ class HBNBCommand(cmd.Cmd):
                 self.do_destroy(f"{class_name} {instance_id}")
             elif method.startswith('update(') and method.endswith(')'):
                 args = method.strip('update(').strip(')').split(',')
-                if len(args) < 2:
-                    print("** invalid syntax **")
-                    return
-                # Check if updating with dictionary
-                if '{' in args[1] and '}' in args[1]:
-                    self.do_update(f"{class_name} {args[0]}, {args[1]}")
-                else:
-                    if len(args) != 3:
-                        print("** invalid syntax **")
-                        return
+                if len(args) == 2:
+                    self.do_update(f"{class_name} {args[0]} {args[1]}")
+                elif len(args) == 3:
                     self.do_update(
-                        f"{class_name} {args[0]}, {args[1]}, {args[2]}")
+                        f"{class_name} {args[0]} {args[1]} {args[2]}")
+                elif len(args) == 1 and args[0].startswith('{') and args[0].endswith('}'):
+                    self.do_update(
+                        f"{class_name} {method.strip('update(').strip(')')} {args[0]}")
+                else:
+                    print("** invalid syntax **")
             else:
                 print("** invalid syntax **")
         else:
