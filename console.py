@@ -100,47 +100,50 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, arg):
         """Updates an instance based on the class name and id."""
-        args = arg.split(',')
+        args = arg.split()
+        if len(args) < 1:
+            print("** class name missing **")
+            return
+        class_name = args[0]
+        if class_name not in globals():
+            print("** class doesn't exist **")
+            return
         if len(args) < 2:
-            print("** invalid number of arguments **")
+            print("** instance id missing **")
             return
-        class_name_id = args[0].split()
-        if len(class_name_id) != 2:
-            print("** invalid syntax **")
-            return
-        class_name = class_name_id[0]
-        instance_id = class_name_id[1]
+        instance_id = args[1]
         key = class_name + '.' + instance_id
         if key not in storage.all():
             print("** no instance found **")
             return
+        if len(args) < 3:
+            print("** attribute name missing **")
+            return
+        if len(args) < 4:
+            print("** value missing **")
+            return
 
-        # Check if the update is with a dictionary
-        if '{' in args[1] and '}' in args[1]:
-            try:
-                update_dict = eval(args[1].strip())
-                if not isinstance(update_dict, dict):
-                    raise TypeError
-            except (SyntaxError, TypeError):
-                print("** invalid dictionary syntax **")
-                return
+        attribute_name = args[2]
+        attribute_value = args[3]
 
-            instance = storage.all()[key]
-            for attribute, value in update_dict.items():
-                setattr(instance, attribute, value)
-            instance.save()
-        else:  # Update with attribute name and value
-            if len(args) < 3:
-                print("** invalid number of arguments **")
-                return
-            attribute_name = args[1].strip()
-            attribute_value = args[2].strip()
-            instance = storage.all()[key]
+        # Cast attribute value to the correct type
+        try:
+            if attribute_value[0] == '"':
+                attribute_value = attribute_value.strip('"')
+            elif '.' in attribute_value:
+                attribute_value = float(attribute_value)
+            else:
+                attribute_value = int(attribute_value)
+        except ValueError:
+            pass
+
+        instance = storage.all()[key]
+        if attribute_name not in ["id", "created_at", "updated_at"]:
             setattr(instance, attribute_name, attribute_value)
             instance.save()
 
     def default(self, arg):
-        """Handle method calls with format<class name>.all(),
+        """Handle method calls with format <class name>.all(),
         <class name>.count(), <class name>.show(<id>),
         <class name>.destroy(<id>), or <class name>.update(<id>,
         <attribute name>, <attribute value>)"""
