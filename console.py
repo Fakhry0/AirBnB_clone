@@ -126,17 +126,26 @@ class HBNBCommand(cmd.Cmd):
         instance.save()
 
     def default(self, arg):
-        """Handle method calls with format <class name>.all()"""
+        """Handle method calls with format <class name>.all() or <class name>.count()"""
         tokens = arg.split('.')
-        if len(tokens) == 2 and tokens[1] == 'all()':
-            class_name = tokens[0]
-            if class_name not in globals():
-                print("** class doesn't exist **")
-                return
-            print([str(value) for value in storage.all().values()
-                  if isinstance(value, globals()[class_name])])
-            return
-        super().default(arg)
+        if len(tokens) == 2:
+            class_name, method = tokens
+            if method == 'all()':
+                if class_name not in globals():
+                    print("** class doesn't exist **")
+                    return
+                print([str(value) for value in storage.all().values()
+                      if isinstance(value, globals()[class_name])])
+            elif method == 'count()':
+                if class_name not in globals():
+                    print("** class doesn't exist **")
+                    return
+                print(len([value for value in storage.all().values()
+                      if isinstance(value, globals()[class_name])]))
+            else:
+                print("** invalid syntax **")
+        else:
+            super().default(arg)
 
 
 if __name__ == '__main__':
