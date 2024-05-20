@@ -101,7 +101,7 @@ class HBNBCommand(cmd.Cmd):
     def do_update(self, arg):
         """Updates an instance based on the class name and id."""
         args = arg.split(',')
-        if len(args) < 3:
+        if len(args) < 2:
             print("** invalid number of arguments **")
             return
         class_name_id = args[0].split()
@@ -114,11 +114,30 @@ class HBNBCommand(cmd.Cmd):
         if key not in storage.all():
             print("** no instance found **")
             return
-        attribute_name = args[1].strip()
-        attribute_value = args[2].strip()
-        instance = storage.all()[key]
-        setattr(instance, attribute_name, attribute_value)
-        instance.save()
+
+        # Check if the update is with a dictionary
+        if '{' in args[1] and '}' in args[1]:
+            try:
+                update_dict = eval(args[1].strip())
+                if not isinstance(update_dict, dict):
+                    raise TypeError
+            except (SyntaxError, TypeError):
+                print("** invalid dictionary syntax **")
+                return
+
+            instance = storage.all()[key]
+            for attribute, value in update_dict.items():
+                setattr(instance, attribute, value)
+            instance.save()
+        else:  # Update with attribute name and value
+            if len(args) < 3:
+                print("** invalid number of arguments **")
+                return
+            attribute_name = args[1].strip()
+            attribute_value = args[2].strip()
+            instance = storage.all()[key]
+            setattr(instance, attribute_name, attribute_value)
+            instance.save()
 
     def default(self, arg):
         """Handle method calls with format <class name>.all(), <class name>.count(), <class name>.show(<id>), <class name>.destroy(<id>), or <class name>.update(<id>, <attribute name>, <attribute value>)"""
@@ -145,10 +164,18 @@ class HBNBCommand(cmd.Cmd):
                 self.do_destroy(f"{class_name} {instance_id}")
             elif method.startswith('update(') and method.endswith(')'):
                 args = method.strip('update(').strip(')').split(',')
-                if len(args) != 3:
+                if len(args) < 2:
                     print("** invalid syntax **")
                     return
-                self.do_update(f"{class_name} {args[0]}, {args[1]}, {args[2]}")
+                # Check if updating with dictionary
+                if '{' in args[1] and '}' in args[1]:
+                    self.do_update(f"{class_name} {args[0]}, {args[1]}")
+                else:
+                    if len(args) != 3:
+                        print("** invalid syntax **")
+                        return
+                    self.do_update(
+                        f"{class_name} {args[0]}, {args[1]}, {args[2]}")
             else:
                 print("** invalid syntax **")
         else:
