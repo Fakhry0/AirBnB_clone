@@ -129,7 +129,7 @@ class HBNBCommand(cmd.Cmd):
         instance.save()
 
     def default(self, arg):
-        """Handle method calls with format <class name>.all(), <class name>.count(), or <class name>.show(<id>)"""
+        """Handle method calls with format <class name>.all(), <class name>.count(), <class name>.show(<id>), or <class name>.destroy(<id>)"""
         tokens = arg.split('.')
         if len(tokens) == 2:
             class_name, method = tokens
@@ -148,6 +148,9 @@ class HBNBCommand(cmd.Cmd):
             elif method.startswith('show(') and method.endswith(')'):
                 instance_id = method.strip('show(').strip(')')
                 self.do_show(f"{class_name} {instance_id}")
+            elif method.startswith('destroy(') and method.endswith(')'):
+                instance_id = method.strip('destroy(').strip(')')
+                self.do_destroy(f"{class_name} {instance_id}")
             else:
                 print("** invalid syntax **")
         else:
