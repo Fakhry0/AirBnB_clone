@@ -13,6 +13,7 @@ class BaseModel:
 
     def __init__(self, *args, **kwargs):
         """Initializes a new BaseModel instance."""
+        self.name = ""  # Add this line
         if kwargs:
             for key, value in kwargs.items():
                 if key == 'created_at' or key == 'updated_at':

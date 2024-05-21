@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+"""Test BaseModel"""
+
 import unittest
 from models.base_model import BaseModel
 from models import storage
@@ -25,6 +28,8 @@ class TestBaseModel(unittest.TestCase):
         self.assertTrue(hasattr(self.model, 'created_at'))
         self.assertTrue(hasattr(self.model, 'updated_at'))
         self.assertEqual(self.model.created_at, self.model.updated_at)
+        self.assertAlmostEqual(self.model.created_at,
+                               self.model.updated_at, delta=timedelta(seconds=1))
 
     def test_to_dict(self):
         """Test the to_dict method"""
