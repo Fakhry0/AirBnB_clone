@@ -1,11 +1,14 @@
 #!/usr/bin/python3
-"""This module creates a Place class"""
-
+"""
+Place class for the AirBnB clone project.
+"""
 from models.base_model import BaseModel
 
 
 class Place(BaseModel):
-    """Place class"""
+    """
+    Place class that inherits from BaseModel.
+    """
     city_id = ""
     user_id = ""
     name = ""

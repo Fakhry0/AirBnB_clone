@@ -1,56 +1,51 @@
 #!/usr/bin/python3
-"""Defines unittests for models/engine/file_storage.py."""
+
+"""
+Unittest for FileStorage
+"""
+
 import unittest
-import os
 import json
-from models.base_model import BaseModel
+import os
 from models.engine.file_storage import FileStorage
+from models.user import User
 
 
-class TestFileStorage(unittest.TestCase):
-    """Unittests for testing the FileStorage class."""
+class TestFileStorageWithUser(unittest.TestCase):
 
     def setUp(self):
-        """Set up test environment."""
+        """Set up test environment"""
         self.storage = FileStorage()
-        self.storage._FileStorage__file_path = "test_file.json"
-        self.model = BaseModel()
+        self.file_path = "file.json"
+        self.user = User(email="test@example.com",
+                         password="password", first_name="John", last_name="Doe")
+        self.user.save()
 
     def tearDown(self):
-        """Remove storage file at end of tests."""
-        try:
-            os.remove("test_file.json")
-        except IOError:
-            pass
+        """Remove the JSON file after tests"""
+        if os.path.exists(self.file_path):
+            os.remove(self.file_path)
 
-    def test_file_path(self):
-        """Test __file_path attribute."""
-        self.assertEqual(self.storage._FileStorage__file_path,
-                         "test_file.json")
+    def test_user_added_to_objects(self):
+        """Test that user is added to __objects"""
+        key = f"{self.user.__class__.__name__}.{self.user.id}"
+        self.assertIn(key, self.storage.all())
 
-    def test_all(self):
-        """Test all method."""
-        self.assertIsInstance(self.storage.all(), dict)
-
-    def test_new(self):
-        """Test new method."""
-        self.storage.new(self.model)
-        self.assertIn(f"BaseModel.{self.model.id}", self.storage.all())
-
-    def test_save(self):
-        """Test save method."""
-        self.storage.new(self.model)
+    def test_user_serialized_to_json(self):
+        """Test that user is serialized to JSON file"""
         self.storage.save()
-        with open("test_file.json", "r") as f:
+        self.assertTrue(os.path.exists(self.file_path))
+        with open(self.file_path, "r") as f:
             data = json.load(f)
-        self.assertIn(f"BaseModel.{self.model.id}", data)
+            self.assertIn(
+                f"{self.user.__class__.__name__}.{self.user.id}", data)
 
-    def test_reload(self):
-        """Test reload method."""
-        self.storage.new(self.model)
+    def test_user_deserialized_from_json(self):
+        """Test that user is deserialized from JSON file"""
         self.storage.save()
         self.storage.reload()
-        self.assertIn(f"BaseModel.{self.model.id}", self.storage.all())
+        key = f"{self.user.__class__.__name__}.{self.user.id}"
+        self.assertIn(key, self.storage.all())
 
 
 if __name__ == "__main__":

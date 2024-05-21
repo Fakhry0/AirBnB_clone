@@ -1,9 +1,12 @@
 #!/usr/bin/python3
-"""This module creates a User class"""
-
+"""
+State class for the AirBnB clone project.
+"""
 from models.base_model import BaseModel
 
 
 class State(BaseModel):
-    """State class"""
+    """
+    State class that inherits from BaseModel.
+    """
     name = ""

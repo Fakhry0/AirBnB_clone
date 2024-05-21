@@ -1,9 +1,12 @@
 #!/usr/bin/python3
-"""This module creates a Amenity class"""
-
+"""
+Amenity class for the AirBnB clone project.
+"""
 from models.base_model import BaseModel
 
 
 class Amenity(BaseModel):
-    """Amenity class"""
+    """
+    Amenity class that inherits from BaseModel.
+    """
     name = ""
