@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import cmd
-import json
 import shlex
 from models import storage
 from models.base_model import BaseModel
@@ -117,22 +116,34 @@ class HBNBCommand(cmd.Cmd):
         if key not in storage.all():
             print("** no instance found **")
             return
-        if len(args) == 2:
+
+        if len(args) == 3:
             print("** attribute name missing **")
             return
-        if len(args) == 3:
+        if len(args) == 2:
             print("** value missing **")
             return
 
         obj = storage.all()[key]
-        attr_name = args[2]
-        attr_value = args[3]
 
-        if attr_name in obj.__class__.__dict__:
-            attr_type = type(obj.__class__.__dict__[attr_name])
-            setattr(obj, attr_name, attr_type(attr_value))
-        else:
-            setattr(obj, attr_name, attr_value)
+        if len(args) == 4:
+            attr_name = args[2]
+            attr_value = args[3]
+
+            if attr_name in obj.__class__.__dict__:
+                attr_type = type(obj.__class__.__dict__[attr_name])
+                setattr(obj, attr_name, attr_type(attr_value))
+            else:
+                setattr(obj, attr_name, attr_value)
+
+        elif len(args) == 3 and isinstance(eval(args[2]), dict):
+            update_dict = eval(args[2])
+            for key, value in update_dict.items():
+                if key in obj.__class__.__dict__:
+                    attr_type = type(obj.__class__.__dict__[key])
+                    setattr(obj, key, attr_type(value))
+                else:
+                    setattr(obj, key, value)
 
         obj.save()
 
